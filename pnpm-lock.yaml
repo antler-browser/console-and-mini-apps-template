@@ -20,7 +20,7 @@ importers:
 
   apps/console:
     dependencies:
-      '@console-starter/console-shared':
+      '@console-and-mini-apps-template/console-shared':
         specifier: workspace:*
         version: link:shared
       '@noble/curves':
@@ -57,7 +57,7 @@ importers:
 
   apps/console/client:
     dependencies:
-      '@console-starter/console-shared':
+      '@console-and-mini-apps-template/console-shared':
         specifier: workspace:*
         version: link:../shared
       local-first-auth:
@@ -115,7 +115,7 @@ importers:
 
   apps/console/server:
     dependencies:
-      '@console-starter/console-shared':
+      '@console-and-mini-apps-template/console-shared':
         specifier: workspace:*
         version: link:../shared
       drizzle-orm:

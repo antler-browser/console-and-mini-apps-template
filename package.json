@@ -1,10 +1,10 @@
 {
-  "name": "console-starter",
+  "name": "console-and-mini-apps-template",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-  "description": "Console Starter — the host console plus its mini apps, in one workspace.",
+  "description": "Console And Mini Apps Template — the host console plus its mini apps, in one workspace.",
   "packageManager": "pnpm@10.21.0",
   "engines": {
     "node": ">=22"

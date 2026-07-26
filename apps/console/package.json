@@ -1,5 +1,5 @@
 {
-  "name": "@console-starter/console",
+  "name": "@console-and-mini-apps-template/console",
   "private": true,
   "description": "The host console — landing grid, SPA fallback, and admin console for the workspace's mini apps.",
   "license": "MIT",
@@ -15,23 +15,23 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "predev": "tsx scripts/build-client-if-missing.ts && pnpm --filter=@console-starter/console-shared build",
-    "predev:simulator": "tsx scripts/build-client-if-missing.ts && pnpm --filter=@console-starter/console-shared build",
+    "predev": "tsx scripts/build-client-if-missing.ts && pnpm --filter=@console-and-mini-apps-template/console-shared build",
+    "predev:simulator": "tsx scripts/build-client-if-missing.ts && pnpm --filter=@console-and-mini-apps-template/console-shared build",
     "dev": "concurrently \"wrangler dev --local\" \"pnpm dev:client\" --names \"worker,client\" --prefix-colors \"blue,green\"",
     "dev:simulator": "concurrently \"wrangler dev --local\" \"pnpm dev:client:simulator\" --names \"worker,client\" --prefix-colors \"blue,green\"",
-    "dev:client": "pnpm --filter=@console-starter/console-client dev",
-    "dev:client:simulator": "pnpm --filter=@console-starter/console-client dev:simulator",
+    "dev:client": "pnpm --filter=@console-and-mini-apps-template/console-client dev",
+    "dev:client:simulator": "pnpm --filter=@console-and-mini-apps-template/console-client dev:simulator",
     "dev:server": "wrangler dev --local",
     "deploy:cloudflare": "pnpm build && alchemy deploy",
     "destroy:cloudflare": "alchemy destroy",
-    "build": "pnpm run --filter=@console-starter/console-shared build && pnpm run --filter=@console-starter/console-client build",
-    "build:client": "pnpm --filter=@console-starter/console-client build",
-    "db:generate-migrations": "pnpm --filter=@console-starter/console-server db:generate-migrations",
+    "build": "pnpm run --filter=@console-and-mini-apps-template/console-shared build && pnpm run --filter=@console-and-mini-apps-template/console-client build",
+    "build:client": "pnpm --filter=@console-and-mini-apps-template/console-client build",
+    "db:generate-migrations": "pnpm --filter=@console-and-mini-apps-template/console-server db:generate-migrations",
     "db:run-migrations": "tsx scripts/run-dev-migrations.ts"
   },
   "dependencies": {
     "@noble/curves": "^2.0.1",
-    "@console-starter/console-shared": "workspace:*",
+    "@console-and-mini-apps-template/console-shared": "workspace:*",
     "base58-universal": "^2.0.0",
     "drizzle-orm": "^0.44.7",
     "jwt-decode": "^4.0.0"

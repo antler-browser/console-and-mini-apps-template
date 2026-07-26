@@ -6,7 +6,7 @@
 # any unique string works and no Cloudflare account is needed. Keep the bindings in
 # sync with MANAGED_APPS in shared/src/apps.ts.
 
-name = "console-starter-dev"
+name = "console-and-mini-apps-template-dev"
 main = "server/src/index.ts"
 compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
@@ -14,7 +14,7 @@ compatibility_flags = ["nodejs_compat"]
 # Host's own D1 — stores the operator allowlist (users.is_admin) that gates the console.
 [[d1_databases]]
 binding = "DB"
-database_name = "console-starter-dev-db"
+database_name = "console-and-mini-apps-template-dev-db"
 database_id = "local"
 
 # Managed child app bindings go here — one block per app registered in

@@ -1,4 +1,4 @@
-# CLAUDE.md — Console Starter workspace
+# CLAUDE.md — Console And Mini Apps Template workspace
 
 Guidance for Claude Code when working in this repository.
 
@@ -30,7 +30,8 @@ pnpm build                  # build every app
 pnpm typecheck              # tsc -b every app
 pnpm new-app <slug>         # scaffold a mini app from the template
 pnpm setup-project [name] [--allowed-production-origin <url>] [--github-url <url>]
-                            # rename the workspace + optional prod settings
+                   [--alchemy-state-token <value>]
+                            # one-time project setup: name + optional prod settings
 ```
 
 Per-app commands run from inside the app's directory (`cd apps/<slug>`):
@@ -45,21 +46,29 @@ pnpm run db:generate-migrations / db:run-migrations / deploy:cloudflare
 
 ## Project Setup (Claude: Follow These Instructions)
 
-**When to run these steps:** when the user asks to "set up", "initialize", or "rename"
-this project.
+**When to run these steps:** when the user asks to "set up" or "initialize" this
+project — it is **one-time**: it refuses to run on a workspace that was already set
+up (renamed, or with mini apps under `apps/`), and its error message lists the files
+to edit by hand instead.
 
 Run: `pnpm setup-project {kebab-case-name}` (defaults to the repo directory name). It
 rewrites the package scope, Cloudflare resource names, and display strings from the
-current workspace name to the new one, reinstalls, and migrates the console's local D1
+template name to the new one, reinstalls, and migrates the console's local D1
 (fully local — dev D1 ids are just local storage keys, no Cloudflare auth needed).
+It also ensures `ALCHEMY_STATE_TOKEN` is set in `apps/console/.env` (a self-chosen
+secret; one token per Cloudflare account). Interactive runs are prompted; runs from
+Claude/CI are non-TTY, so the prompt is skipped — ask the user whether their
+Cloudflare account already has a token from another Alchemy project (it must be
+reused), then pass it via `--alchemy-state-token <value>`; only generate a fresh one
+(`openssl rand -hex 32`) if they don't have one.
 Optional flags: `--allowed-production-origin <url>` sets `ALLOWED_PRODUCTION_ORIGIN`
-in every `apps/*/alchemy.run.ts`, and `--github-url <url>` points each app's footer link
-(`apps/*/client/src/components/Footer.tsx`) at the user's fork; a flags-only run
-leaves the name unchanged. Both flags also update `templates/mini-app-starter`, so
-apps scaffolded later by `new-app` inherit the values — set them once, never twice.
-It is idempotent and ends with a checklist of only what remains manual (e.g. the
-GitHub template flag). Ordering rule: run it **before** `pnpm new-app` — scaffolded
-apps bake in the workspace name.
+and `--github-url <url>` sets the footer link (`client/src/components/Footer.tsx`) —
+both in `apps/console` and in `templates/mini-app-starter`, so apps scaffolded later
+by `new-app` inherit the values. To change either after setup, edit those files
+directly (in each existing app and the template). It ends with a checklist of only
+what remains manual (e.g. the GitHub template flag). Ordering rule: run it **before**
+`pnpm new-app` — scaffolded apps bake in the workspace name (the guard enforces
+this).
 
 ## Adding a mini app (Claude: Follow These Instructions)
 

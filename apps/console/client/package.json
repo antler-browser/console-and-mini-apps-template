@@ -1,5 +1,5 @@
 {
-  "name": "@console-starter/console-client",
+  "name": "@console-and-mini-apps-template/console-client",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@console-starter/console-shared": "workspace:*",
+    "@console-and-mini-apps-template/console-shared": "workspace:*",
     "local-first-auth": "^3.0.1",
     "local-first-auth-import-export": "^1.0.0",
     "qrcode.react": "^4.2.0",

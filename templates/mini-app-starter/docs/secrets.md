@@ -13,6 +13,11 @@ The sorting rule: **does the value differ between local dev and prod?**
 | **Env-invariant runtime values** (same value locally and in prod — secrets AND non-secrets, e.g. an API key, an account id, a bucket name) | `MY_SECRET`, `R2_ACCOUNT_ID` | `.env`, injected into `c.env` via `[secrets] required` in wrangler.toml | binding in alchemy.run.ts, seeded from `.env` at deploy: `alchemy.secret.env.X` for secrets, `alchemy.env.X` for non-secrets — both throw if the var is unset | No — `.env` only |
 | **Env-varying non-secrets** (different value locally vs prod) | `ALLOWED_PRODUCTION_ORIGIN` | committed literal in wrangler.toml `[vars]` if dev needs one (`ALLOWED_PRODUCTION_ORIGIN` is deliberately unset in dev — the JWT audience check is skipped) | committed literal in alchemy.run.ts | Yes — both files |
 
+`ALCHEMY_STATE_TOKEN` is a secret you invent yourself (not fetched from any service):
+it guards the small state Worker Alchemy deploys to your Cloudflare account. **One
+token per account** — every Alchemy project deploying there must use the same value,
+so reuse an existing one rather than generating a second.
+
 Why env-varying values must be committed literals and **never route through `.env`**:
 `alchemy deploy` loads `.env`, so a local deploy would push your localhost values
 (e.g. localhost origins) to prod. A value can only live in `.env` if it is safe for
@@ -24,7 +29,8 @@ separate `.env` key that only alchemy.run.ts reads.)
 
 ## One env file: `.env`
 
-There is a single, gitignored `.env` (copy `.env.example` and fill it in). Two tools
+There is a single, gitignored `.env` (copy `.env.example` and fill it in — inside the
+console workspace, `pnpm new-app` seeds it from `apps/console/.env`). Two tools
 read it at two different times:
 
 | Consumer | When | Reads |

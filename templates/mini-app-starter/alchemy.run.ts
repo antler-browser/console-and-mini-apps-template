@@ -14,11 +14,11 @@ import type { Broadcaster } from './server/src/durable-object'
 
 // The single origin this app accepts Local First Auth JWTs for. Committed literal
 // on purpose — never read this from .env (alchemy deploy loads .env, so a local
-// deploy would push a localhost origin to prod). `pnpm setup-project
-// --allowed-production-origin https://your.domain` (from the workspace root) replaces
-// it everywhere at once. While it is still the placeholder, no routes are attached —
-// the Worker only gets its workers.dev URL.
-const ALLOWED_PRODUCTION_ORIGIN = 'https://your-domain.example'
+// deploy would push a localhost origin to prod). Set at setup time by
+// `pnpm setup-project --allowed-production-origin`; to change it later, edit this
+// literal (in each app and the template). While it is still the placeholder, no
+// routes are attached — the Worker only gets its workers.dev URL.
+const ALLOWED_PRODUCTION_ORIGIN = 'https://x.example'
 const hasRealOrigin = !ALLOWED_PRODUCTION_ORIGIN.includes('your-domain.example')
 
 // Initialize Alchemy app with remote state store

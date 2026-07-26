@@ -1,8 +1,8 @@
-# Console Starter — Mini App Host
+# Console And Mini Apps Template — Mini App Host
 
 ## Overview
 
-This repo is the **host** for a collection of Console Starter mini apps. It's a single catch-all
+This repo is the **host** for a collection of Console And Mini Apps Template mini apps. It's a single catch-all
 Cloudflare Worker that:
 
 - serves a **landing grid** of mini apps at `/` (driven by `client/src/apps.ts`),
@@ -74,10 +74,15 @@ The host deploys to Cloudflare with [Alchemy](https://alchemy.run) (config in
 [Alchemy CLI docs](https://alchemy.run/docs/cli/configuration)):
 
 ```bash
-cp .env.example .env         # fill in CLOUDFLARE_ACCOUNT_ID + ALCHEMY_STATE_TOKEN
+# pnpm setup-project already created .env with ALCHEMY_STATE_TOKEN — just fill in
+# CLOUDFLARE_ACCOUNT_ID (no .env yet? cp .env.example .env, see its comments)
 pnpm alchemy configure       # from this directory (alchemy is a devDep here)
 pnpm run deploy:cloudflare   # build + alchemy deploy
 ```
+
+`ALCHEMY_STATE_TOKEN` is a self-chosen secret guarding Alchemy's state Worker; one
+token per Cloudflare account — reuse an existing one if another Alchemy project
+already deployed there (`pnpm setup-project` handles this).
 
 A custom domain / Cloudflare zone is a prerequisite for path-based routing — set that up
 first per [`docs/domain-setup.md`](./docs/domain-setup.md). Once `ALLOWED_PRODUCTION_ORIGIN`

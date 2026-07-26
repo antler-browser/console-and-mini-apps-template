@@ -1,4 +1,4 @@
-# Console Starter
+# Console And Mini Apps Template
 
 A starter template for hosting a family of [Local First Auth](docs/local-first-auth-spec.md)
 mini apps on one domain — a **host console** (landing grid + admin) plus as many
@@ -17,7 +17,7 @@ templates/
   mini-app-starter/   The starter new apps are generated from. Yours to edit.
 scripts/
   new-app.ts          pnpm new-app <slug>      — scaffold a mini app
-  setup-project.ts    pnpm setup-project name  — rename the workspace, set origins/repo link
+  setup-project.ts    pnpm setup-project name  — one-time setup: name, creds, origin, repo link
 docs/                 Shared reference docs (auth spec, examples, troubleshooting)
 ```
 
@@ -43,8 +43,9 @@ monorepo changes how they're developed, not how they ship.
    account needed) and prints a checklist of anything left. The flags are optional:
    `--allowed-production-origin` sets the production auth origin in each app's
    `alchemy.run.ts` (skip it until you have a domain), and `--github-url` points each
-   app's footer link at your fork. Everything is safe to re-run later — the name
-   defaults to the repo directory, and a flags-only run leaves the name alone.
+   app's footer link at your fork. Setup is one-time — the name defaults to the repo
+   directory, and re-running on an already-set-up project errors out; later changes
+   are plain file edits (the error message says which files).
 
    Run `setup-project` **before** scaffolding any apps — `new-app` bakes the
    workspace name into everything it generates.
@@ -67,7 +68,7 @@ Requires Node >= 22 (`.nvmrc`) and pnpm 10.
 | `pnpm build` | Build every app (from the root) |
 | `pnpm typecheck` | Typecheck every app (from the root) |
 | `pnpm new-app <slug>` | Scaffold a new mini app |
-| `pnpm setup-project [name] [--allowed-production-origin <url>] [--github-url <url>]` | Rename the workspace / set the prod origin + footer repo link |
+| `pnpm setup-project [name] [--allowed-production-origin <url>] [--github-url <url>] [--alchemy-state-token <value>]` | One-time project setup: name, deploy creds, prod origin, footer repo link |
 
 Each app claims its own worker + vite port pair (console is 8787/5173, the next app
 gets 8788/5174, and so on). Anything app-specific runs from the app's directory,
@@ -98,18 +99,24 @@ Apps deploy independently to Cloudflare's free tier:
 ```bash
 # once per app: deploy credentials (alchemy is an app-level devDep, not a root one)
 cd apps/console
-cp .env.example .env          # fill in CLOUDFLARE_ACCOUNT_ID + ALCHEMY_STATE_TOKEN
+# pnpm setup-project already created .env with ALCHEMY_STATE_TOKEN — just fill in
+# CLOUDFLARE_ACCOUNT_ID (no .env yet? cp .env.example .env, see its comments)
 pnpm exec alchemy configure   # once: Cloudflare API token
 
 pnpm run deploy:cloudflare    # per app: build + deploy
 ```
 
+`ALCHEMY_STATE_TOKEN` is a secret you invent yourself (not fetched from anywhere) —
+it guards the small state Worker Alchemy deploys to your Cloudflare account. One
+token per account: if you already deployed another Alchemy project there, reuse that
+token (`pnpm setup-project` asks for it and generates one only if you don't have one).
+
 Path-based routing (`<domain>/<slug>/*`) needs a real Cloudflare zone — a custom
 domain, not `*.workers.dev`. Set that up per
 [`apps/console/docs/domain-setup.md`](apps/console/docs/domain-setup.md), attach the
 host's `<domain>/*` route in the dashboard, and replace the
-`https://your-domain.example` placeholder in each app's `alchemy.run.ts` (or run
-`pnpm setup-project --allowed-production-origin https://your.domain` from the root).
+`https://your-domain.example` placeholder in each app's `alchemy.run.ts` (and in
+`templates/mini-app-starter/alchemy.run.ts`, so future apps inherit it).
 
 ## Secrets & env vars
 

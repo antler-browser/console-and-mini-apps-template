@@ -7,11 +7,11 @@
  * referenced by UUID in alchemy.run.ts / wrangler.toml (the child apps own them) and live
  * in the same Cloudflare account. The ASSETS binding is handled by Alchemy's Worker `assets` config.
  */
-import type { ChildBindingKey } from '@console-starter/console-shared'
+import type { ChildBindingKey } from '@console-and-mini-apps-template/console-shared'
 
 /**
  * Managed child app D1s are referenced by UUID and keyed by `ChildBindingKey` from
- * `@console-starter/console-shared` (the single source of truth for the registry), so the binding keys
+ * `@console-and-mini-apps-template/console-shared` (the single source of truth for the registry), so the binding keys
  * here can't drift from server/src/admin-apps.ts or alchemy.run.ts.
  */
 export type Env = {

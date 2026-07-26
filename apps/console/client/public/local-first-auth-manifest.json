@@ -1,6 +1,6 @@
 {
-  "name": "Console Starter",
-  "description": "The Console Starter directory of mini apps for you and your friends",
+  "name": "Console And Mini Apps Template",
+  "description": "The Console And Mini Apps Template directory of mini apps for you and your friends",
   "icon": "./icon.webp",
   "type": "app",
   "permissions": []

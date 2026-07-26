@@ -106,7 +106,7 @@ Only `/guestbook/*` is claimed — the bare `/guestbook` path is deliberately le
 host's catch-all, so **every inbound link must use the trailing-slash form
 `/guestbook/`**. Template-scaffolded apps derive the route from
 `ALLOWED_PRODUCTION_ORIGIN` automatically once it is set to the real domain
-(`pnpm setup-project --allowed-production-origin https://your.domain`).
+(edit the literal in the app's `alchemy.run.ts`).
 
 `run_worker_first` matters because assets are uploaded at dist-root keys
 (`/assets/x.js`) while the page requests them under the subpath

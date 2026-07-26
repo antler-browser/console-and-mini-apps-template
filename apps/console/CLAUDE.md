@@ -106,8 +106,8 @@ The host owns only its own D1 (`<workspace>-dev-db` locally, `<workspace>-<stage
 in prod). Child databases are referenced by UUID, never created or migrated here.
 
 ```bash
-pnpm wrangler d1 execute console-starter-dev-db --local --command "SELECT * FROM users;"
-pnpm wrangler d1 execute console-starter-prod-db --remote --command "SELECT * FROM users;"
+pnpm wrangler d1 execute console-and-mini-apps-template-dev-db --local --command "SELECT * FROM users;"
+pnpm wrangler d1 execute console-and-mini-apps-template-prod-db --remote --command "SELECT * FROM users;"
 ```
 
 Migration workflow: edit `server/src/db/schema.ts` → `pnpm db:generate-migrations` →
@@ -139,9 +139,7 @@ domain (path routing needs a real zone + proxied DNS record — see
 [`docs/domain-setup.md`](./docs/domain-setup.md)); with the placeholder still in place
 you only get the workers.dev URL. The `ALLOWED_PRODUCTION_ORIGIN` value is a committed
 literal in `alchemy.run.ts` on purpose (see [`docs/secrets.md`](./docs/secrets.md)) —
-replace `https://your-domain.example` with your domain (or run
-`pnpm setup-project --allowed-production-origin https://your.domain` from the repo
-root).
+replace `https://your-domain.example` with your domain.
 
 ## Troubleshooting
 

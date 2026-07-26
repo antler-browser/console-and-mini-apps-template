@@ -29,6 +29,7 @@
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
+import { getEnvValue, setEnvValue } from './lib/env'
 import { getWorkspaceName, KEBAB_RE, REPO_ROOT, toTitleCase } from './lib/workspace'
 const TEMPLATE_DIR = path.join(REPO_ROOT, 'templates', 'mini-app-starter')
 const APPS_DIR = path.join(REPO_ROOT, 'apps')
@@ -166,6 +167,35 @@ if (leftovers.length > 0) {
   )
 }
 
+// ── deploy creds (shared across the whole Cloudflare account) ───────────────
+/**
+ * Seed apps/<slug>/.env from the console's deploy creds. ALCHEMY_STATE_TOKEN
+ * must be identical for every Alchemy deployment on one Cloudflare account, so
+ * copying it (plus the account id and stage) keeps all apps in sync. Returns
+ * true when a non-empty token was carried over.
+ */
+const CRED_KEYS = ['CLOUDFLARE_ACCOUNT_ID', 'ALCHEMY_STATE_TOKEN', 'ALCHEMY_STAGE']
+function copyDeployCreds(): boolean {
+  const consoleEnvPath = path.join(APPS_DIR, 'console', '.env')
+  if (!fs.existsSync(consoleEnvPath)) return false
+
+  const consoleEnv = fs.readFileSync(consoleEnvPath, 'utf8')
+  const examplePath = path.join(destDir, '.env.example')
+  let content = fs.existsSync(examplePath) ? fs.readFileSync(examplePath, 'utf8') : ''
+  const copied: string[] = []
+  for (const key of CRED_KEYS) {
+    const value = getEnvValue(consoleEnv, key)
+    if (!value) continue
+    content = setEnvValue(content, key, value)
+    copied.push(key)
+  }
+  if (copied.length === 0) return false
+  fs.writeFileSync(path.join(destDir, '.env'), content)
+  console.log(`   created apps/${slug}/.env (${copied.join(', ')} copied from apps/console/.env)`)
+  return copied.includes('ALCHEMY_STATE_TOKEN')
+}
+const credsCopied = copyDeployCreds()
+
 // ── ports ───────────────────────────────────────────────────────────────────
 const wranglerPath = path.join(destDir, 'wrangler.toml')
 fs.writeFileSync(
@@ -227,10 +257,17 @@ console.log(`
 Next steps:
   1. Run it: cd apps/${slug} && pnpm dev   (simulator sign-in: pnpm dev:simulator)
   2. Build your features — see apps/${slug}/CLAUDE.md.
-  3. Deploy: cp apps/${slug}/.env.example apps/${slug}/.env, set ALCHEMY_STATE_TOKEN,
-     then from apps/${slug}: pnpm run deploy:cloudflare
+  3. Deploy: ${
+    credsCopied
+      ? `from apps/${slug}: pnpm run deploy:cloudflare
+     (deploy creds already copied from apps/console/.env into apps/${slug}/.env)`
+      : `cp apps/${slug}/.env.example apps/${slug}/.env, fill in CLOUDFLARE_ACCOUNT_ID
+     and ALCHEMY_STATE_TOKEN — use the SAME token as apps/console (Alchemy allows one
+     token per Cloudflare account).
+     Then from apps/${slug}: pnpm run deploy:cloudflare`
+  }
      (routes attach automatically once ALLOWED_PRODUCTION_ORIGIN is your real domain —
-      set it once for all apps: pnpm setup-project --allowed-production-origin https://your.domain)
+      edit the literal in each app's alchemy.run.ts and the template's)
   4. After the first deploy, register the app with the host console — follow
      "Register with the host console" in apps/console/docs/hosting-a-mini-app.md
      (grid card, MANAGED_APPS + ChildBindingKey, DB_${slug.replace(/-/g, '_').toUpperCase()} dev binding, redeploy host).

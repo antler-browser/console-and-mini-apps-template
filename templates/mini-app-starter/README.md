@@ -29,14 +29,16 @@ to learn patterns from.
 ## Deploy
 
 ```bash
-cp .env.example .env         # then fill in CLOUDFLARE_ACCOUNT_ID + ALCHEMY_STATE_TOKEN
+# pnpm new-app already created .env from apps/console's deploy creds when they
+# existed; otherwise: cp .env.example .env, fill in CLOUDFLARE_ACCOUNT_ID and use
+# the SAME ALCHEMY_STATE_TOKEN as apps/console (one token per Cloudflare account)
 pnpm exec alchemy configure  # one-time Cloudflare API token setup (alchemy is a devDep)
 pnpm run deploy:cloudflare
 ```
 
 Routes on the shared domain attach automatically once `ALLOWED_PRODUCTION_ORIGIN` in
-`alchemy.run.ts` is your real domain — set it once for every app from the workspace
-root: `pnpm setup-project --allowed-production-origin https://your.domain`.
+`alchemy.run.ts` is your real domain — edit the literal in this app's `alchemy.run.ts`
+(and in `templates/mini-app-starter/alchemy.run.ts` so future apps inherit it).
 
 After the first deploy, register the app with the host console (landing-grid card +
 admin bindings): follow **"Register with the host console"** in

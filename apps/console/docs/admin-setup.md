@@ -9,10 +9,10 @@ There are two kinds of admin in this repo:
 
 ```bash
 # Dev (local host D1)
-pnpm wrangler d1 execute console-starter-dev-db --local --command "UPDATE users SET is_admin = 1 WHERE did = 'did:key:z...';"
+pnpm wrangler d1 execute console-and-mini-apps-template-dev-db --local --command "UPDATE users SET is_admin = 1 WHERE did = 'did:key:z...';"
 
 # Production (remote host D1)
-pnpm wrangler d1 execute console-starter-prod-db --remote --command "UPDATE users SET is_admin = 1 WHERE did = 'did:key:z...';"
+pnpm wrangler d1 execute console-and-mini-apps-template-prod-db --remote --command "UPDATE users SET is_admin = 1 WHERE did = 'did:key:z...';"
 ```
 
 Once a DID is a host operator, the Settings → Admin section appears for them and they can

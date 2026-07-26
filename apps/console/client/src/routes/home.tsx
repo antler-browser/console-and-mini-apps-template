@@ -12,7 +12,7 @@ export function Home() {
     <div className="w-full max-w-5xl mx-auto px-4 py-12 sm:py-16">
       <header className="text-center mb-10 sm:mb-14">
         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">
-          Welcome to Console Starter
+          Welcome to Console And Mini Apps Template
         </h1>
       </header>
 

@@ -18,20 +18,20 @@
 import alchemy from 'alchemy'
 import { Assets, D1Database, Worker } from 'alchemy/cloudflare'
 import { CloudflareStateStore } from 'alchemy/state'
-import { MANAGED_APPS } from '@console-starter/console-shared'
+import { MANAGED_APPS } from '@console-and-mini-apps-template/console-shared'
 
 // The single origin we accept Local First Auth JWTs for. All apps are path-routed
 // on one origin, so the per-origin DID is identical across every mini app. Committed
 // literal on purpose — never read this from .env (alchemy deploy loads .env, so a
-// local deploy would push a localhost origin to prod). `pnpm setup-project
-// --allowed-production-origin https://your.domain` (from the workspace root) replaces
-// it everywhere at once. While it is still the placeholder, no routes are attached —
-// the Worker only gets its workers.dev URL. See docs/secrets.md.
-const ALLOWED_PRODUCTION_ORIGIN = 'https://your-domain.example'
+// local deploy would push a localhost origin to prod). Set at setup time by
+// `pnpm setup-project --allowed-production-origin`; to change it later, edit this
+// literal (in each app and the template). While it is still the placeholder, no
+// routes are attached — the Worker only gets its workers.dev URL. See docs/secrets.md.
+const ALLOWED_PRODUCTION_ORIGIN = 'https://x.example'
 const hasRealOrigin = !ALLOWED_PRODUCTION_ORIGIN.includes('your-domain.example')
 
 // Initialize Alchemy app with remote state store
-const app = await alchemy('console-starter', {
+const app = await alchemy('console-and-mini-apps-template', {
   stateStore: (scope) => new CloudflareStateStore(scope),
 })
 
@@ -60,7 +60,7 @@ const database = await D1Database(`${app.name}-${app.stage}-db`, {
  * just points at the existing one. This requires every app to live in the same pinned
  * Cloudflare account (see docs/domain-setup.md §3).
  *
- * One Worker binding per `MANAGED_APPS` entry — the registry in `@console-starter/console-shared` is the single
+ * One Worker binding per `MANAGED_APPS` entry — the registry in `@console-and-mini-apps-template/console-shared` is the single
  * source of truth (including each DB's `databaseId`), shared with server/src/admin-apps.ts.
  * Keep wrangler.toml's dev bindings in sync with it.
  */

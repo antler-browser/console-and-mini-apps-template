@@ -11,7 +11,10 @@ The host currently has **no runtime secrets** — just two buckets:
 | **Infra/deploy creds** | `ALCHEMY_STATE_TOKEN`, `ALCHEMY_STAGE`, `CLOUDFLARE_ACCOUNT_ID` | n/a (never reach the app runtime) | `.env`, read by `alchemy deploy` |
 | **Non-secret vars** | `ALLOWED_PRODUCTION_ORIGIN` (prod-only) | unset — the JWT audience check is skipped in dev | committed literal in alchemy.run.ts — **never via `.env`** (alchemy deploy loads `.env`; a localhost origin would ship to prod) |
 
-Copy `.env.example` → `.env` and fill it in. `.env` sets `ALCHEMY_STAGE=prod`, so
+`pnpm setup-project` creates `.env` from `.env.example` and sets `ALCHEMY_STATE_TOKEN`
+— a secret you invent yourself, guarding Alchemy's state Worker on your Cloudflare
+account. One token per account: if another Alchemy project already deployed there,
+reuse its token. Fill in `CLOUDFLARE_ACCOUNT_ID` yourself. `.env` sets `ALCHEMY_STAGE=prod`, so
 `pnpm deploy:cloudflare` from your machine targets **production**. `pnpm alchemy run`
 is a read-only preflight that executes `alchemy.run.ts` without touching infra.
 

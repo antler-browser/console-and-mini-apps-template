@@ -1,5 +1,5 @@
 {
-  "name": "@console-starter/console-server",
+  "name": "@console-and-mini-apps-template/console-server",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,7 +10,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@console-starter/console-shared": "workspace:*",
+    "@console-and-mini-apps-template/console-shared": "workspace:*",
     "drizzle-orm": "^0.44.7",
     "hono": "^4.10.7"
   },

@@ -57,9 +57,10 @@ show these; keep the local versions:
   console's admin Block action.
 
 Note: `pnpm setup-project --github-url … --allowed-production-origin …` writes your
-fork's values into this copy (the footer link in `client/src/components/Footer.tsx` and
-`ALLOWED_PRODUCTION_ORIGIN` in `alchemy.run.ts`), so the diff against upstream will show
-those lines changed — that's expected; keep your values.
+fork's values into this copy at setup time (the footer link in
+`client/src/components/Footer.tsx` and `ALLOWED_PRODUCTION_ORIGIN` in `alchemy.run.ts`),
+so the diff against upstream will show those lines changed — that's expected; keep your
+values. Setup is one-time, so later changes to either value are edited here by hand.
 
 Note: existing apps under `apps/` are **not** retroactively updated — they diverge
 from the template the moment they're generated, by design.

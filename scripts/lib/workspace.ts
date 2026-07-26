@@ -4,7 +4,7 @@
  * The workspace name in the root package.json is the single source of truth for
  * naming: package scopes are `@<name>/…`, Cloudflare resources are `<name>-…`, and
  * display strings are its Title Case. Scripts derive from it instead of hardcoding,
- * so renaming the project (setup-project) never requires editing the scripts.
+ * so new-app keeps working whatever the project was named at setup time.
  */
 import fs from 'node:fs'
 import path from 'node:path'

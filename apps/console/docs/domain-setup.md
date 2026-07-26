@@ -41,12 +41,9 @@ Alchemy needs a `CLOUDFLARE_API_TOKEN` (and account access) with at least:
 
 ## 4. Set the production origin and deploy the host
 
-Set the real domain everywhere at once (rewrites `ALLOWED_PRODUCTION_ORIGIN` in every
-app's `alchemy.run.ts`, plus the template):
-
-```bash
-pnpm setup-project --allowed-production-origin https://example.com
-```
+Set the real domain by editing the `ALLOWED_PRODUCTION_ORIGIN` literal in every
+app's `alchemy.run.ts`, plus `templates/mini-app-starter/alchemy.run.ts` (so apps
+scaffolded later inherit it).
 
 Then deploy the host Worker:
 

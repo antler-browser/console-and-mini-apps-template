@@ -1,5 +1,5 @@
 {
-  "name": "@console-starter/console-shared",
+  "name": "@console-and-mini-apps-template/console-shared",
   "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
