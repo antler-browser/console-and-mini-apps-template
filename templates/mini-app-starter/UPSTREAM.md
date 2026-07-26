@@ -47,6 +47,12 @@ show these; keep the local versions:
   use `../../docs/…`, which resolves from `apps/<slug>/` after scaffolding.
 - **Subpath serving pre-wired** — router `basename`, `BASE_URL`-relative fetches/WS,
   and derived alchemy `routes`, per `apps/console/docs/hosting-a-mini-app.md`.
+- **Worker-first asset serving** — `run_worker_first: true` in `alchemy.run.ts` and
+  `wrangler.toml`, an `ASSETS: Fetcher` binding in `server/src/types.ts`, and a default
+  export in `server/src/index.ts` that proxies non-API paths to `ASSETS` with the
+  `/__SLUG__` prefix stripped. Needed because assets are uploaded at dist-root keys but
+  requested under the subpath. Only the `/<slug>/*` route is claimed — inbound links
+  always use the trailing-slash form `/<slug>/`.
 - **`blocked` column** in the users schema (migration 0002) — required by the host
   console's admin Block action.
 

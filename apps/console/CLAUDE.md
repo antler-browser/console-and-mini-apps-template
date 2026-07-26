@@ -7,8 +7,9 @@ Guidance for Claude Code when working on `apps/console`, the multi-app **host**.
 This app is the catch-all Cloudflare Worker for the whole domain. It serves a **landing
 grid** of mini apps (`client/src/apps.ts`) at `/`, an SPA fallback for unclaimed paths,
 and an authed **admin console** (Settings → Admin). Each mini app is an independent
-Worker bound to `<domain>/<slug>` + `<domain>/<slug>/*` — the most-specific route wins,
-so child apps automatically override this catch-all for their own paths.
+Worker bound to `<domain>/<slug>/*` — the most-specific route wins, so child apps
+automatically override this catch-all for their own paths. The bare `/<slug>` path is
+not claimed; inbound links always use the trailing-slash form `/<slug>/`.
 
 Unlike the mini apps, the host has **no Durable Object and no WebSockets**. It does have
 its own D1 (the operator allowlist: `users.is_admin` gates the admin console) and binds
@@ -91,7 +92,7 @@ The canonical checklist is **"Register with the host console"** in
 [`docs/hosting-a-mini-app.md`](./docs/hosting-a-mini-app.md). In short, after the
 child app's first deploy (you need its real prod D1 UUID from `wrangler d1 list`):
 
-1. `client/src/apps.ts` — add the landing-grid card (`path: '/<slug>'`, no trailing slash)
+1. `client/src/apps.ts` — add the landing-grid card (`path: '/<slug>/'`, with trailing slash)
 2. `shared/src/apps.ts` — add the entry to `MANAGED_APPS` **and** extend
    `ChildBindingKey` (replace `never` with the union of binding keys, e.g.
    `'DB_CHECK_IN'` — a `MANAGED_APPS` entry without it is a compile error)

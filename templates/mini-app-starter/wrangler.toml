@@ -23,11 +23,15 @@ script_name = "__APP_NAME__-dev"
 tag = "v1"
 new_classes = ["Broadcaster"]
 
-# Static assets (client build)
-# In dev: Vite serves client at :5173 (this is unused)
-# In production: Alchemy uploads these assets to Workers
-# [site]
-# bucket = "./client/dist"
+# Static assets (client build). In dev Vite serves the client at :5173, but the
+# binding must exist because the worker's fetch handler references env.ASSETS.
+# run_worker_first mirrors production (alchemy.run.ts).
+[assets]
+directory = "./client/dist"
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"
+not_found_handling = "single-page-application"
+run_worker_first = true
 
 # Secrets required by the Worker (uncomment when you add your first secret).
 # In local dev, wrangler dev loads ONLY these keys from `.env` into c.env,

@@ -4,7 +4,7 @@
  * This app is the catch-all Worker: it serves the landing-grid SPA and an SPA
  * fallback for any path not claimed by a more-specific child app Worker. Child
  * mini apps live at `apps/<slug>` in this workspace, are deployed independently, and
- * bind their own route patterns (`<domain>/<slug>` + `<domain>/<slug>/*`). Cloudflare
+ * bind their own route pattern (`<domain>/<slug>/*`). Cloudflare
  * resolves the most-specific route first, so child apps automatically override this
  * catch-all.
  *
@@ -96,7 +96,7 @@ export const worker = await Worker('worker', {
     not_found_handling: 'single-page-application',
   },
   // Claim `<domain>/*` — the catch-all. Child mini apps bind more-specific
-  // `/<slug>` + `/<slug>/*` routes that win over this. Activates automatically once
+  // `/<slug>/*` routes that win over this. Activates automatically once
   // ALLOWED_PRODUCTION_ORIGIN is your real domain (the zone + a proxied DNS record
   // must already exist — see docs/domain-setup.md §1-2).
   ...(hasRealOrigin

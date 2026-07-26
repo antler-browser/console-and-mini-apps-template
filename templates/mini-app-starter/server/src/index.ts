@@ -265,9 +265,20 @@ app.get('/api', (c) => {
 // Export Durable Object
 export { Broadcaster }
 
-// Export Worker fetch handler
+// Export Worker fetch handler. run_worker_first routes every request here, so
+// anything that isn't the API is proxied to the ASSETS binding.
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    return app.fetch(request, env, ctx)
+    const url = new URL(request.url)
+
+    // API + WebSocket routes stay on Hono
+    if (url.pathname === '/__SLUG__/api' || url.pathname.startsWith('/__SLUG__/api/')) {
+      return app.fetch(request, env, ctx)
+    }
+
+    // Assets are uploaded at dist-root keys; strip the subpath before lookup.
+    // Unknown paths fall through to index.html via not_found_handling (SPA).
+    url.pathname = url.pathname.slice('/__SLUG__'.length) || '/'
+    return env.ASSETS.fetch(new Request(url.toString(), request))
   },
 }

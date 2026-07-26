@@ -17,6 +17,7 @@
   "scripts": {
     "predev": "tsx scripts/build-client-if-missing.ts && pnpm --filter=@starter/shared build",
     "predev:simulator": "tsx scripts/build-client-if-missing.ts && pnpm --filter=@starter/shared build",
+    "predev:server": "tsx scripts/build-client-if-missing.ts",
     "dev": "concurrently \"wrangler dev --local\" \"pnpm dev:client\" --names \"worker,client\" --prefix-colors \"blue,green\"",
     "dev:simulator": "concurrently \"wrangler dev --local\" \"pnpm dev:client:simulator\" --names \"worker,client\" --prefix-colors \"blue,green\"",
     "dev:client": "pnpm --filter=./client dev",
