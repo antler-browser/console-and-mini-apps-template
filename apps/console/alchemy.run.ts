@@ -9,15 +9,26 @@
  * catch-all.
  *
  * Path-based routes only work on a Cloudflare zone (a custom domain), NOT on
- * *.workers.dev. This script always deploys to a workers.dev URL via `url: true`; the
- * custom-domain route is attached manually in the Cloudflare dashboard once the zone +
- * a proxied DNS record exist (see docs/domain-setup.md).
+ * *.workers.dev. This script always deploys to a workers.dev URL via `url: true`, and
+ * additionally attaches the `<domain>/*` catch-all route automatically once
+ * ALLOWED_PRODUCTION_ORIGIN below is your real domain — the zone + a proxied DNS
+ * record must already exist (see docs/domain-setup.md §1-2).
  */
 
 import alchemy from 'alchemy'
 import { Assets, D1Database, Worker } from 'alchemy/cloudflare'
 import { CloudflareStateStore } from 'alchemy/state'
 import { MANAGED_APPS } from '@console-starter/console-shared'
+
+// The single origin we accept Local First Auth JWTs for. All apps are path-routed
+// on one origin, so the per-origin DID is identical across every mini app. Committed
+// literal on purpose — never read this from .env (alchemy deploy loads .env, so a
+// local deploy would push a localhost origin to prod). `pnpm setup-project
+// --allowed-production-origin https://your.domain` (from the workspace root) replaces
+// it everywhere at once. While it is still the placeholder, no routes are attached —
+// the Worker only gets its workers.dev URL. See docs/secrets.md.
+const ALLOWED_PRODUCTION_ORIGIN = 'https://your-domain.example'
+const hasRealOrigin = !ALLOWED_PRODUCTION_ORIGIN.includes('your-domain.example')
 
 // Initialize Alchemy app with remote state store
 const app = await alchemy('console-starter', {
@@ -66,9 +77,9 @@ const managedDbBindings = Object.fromEntries(
 )
 
 /**
- * Catch-all host Worker. Deploys to a workers.dev URL; attach the custom-domain
- * route (`<domain>/*`) manually in the Cloudflare dashboard — Workers & Pages →
- * this worker → Settings → Domains & Routes → Add route. See docs/domain-setup.md.
+ * Catch-all host Worker. Always deploys to a workers.dev URL (a first smoke test);
+ * the custom-domain route attaches automatically below once ALLOWED_PRODUCTION_ORIGIN
+ * is your real domain. See docs/domain-setup.md.
  */
 export const worker = await Worker('worker', {
   name: `${app.name}-${app.stage}`,
@@ -77,17 +88,20 @@ export const worker = await Worker('worker', {
     ASSETS: staticAssets,
     DB: database,
     ...managedDbBindings,
-    // The single origin we accept Local First Auth JWTs for. All apps are path-routed
-    // on one origin, so the per-origin DID is identical across console/events/party-pics.
-    // Committed literal on purpose — never read this from .env (alchemy deploy loads
-    // .env, so a local deploy would push a localhost origin to prod). Left unset in dev
-    // (wrangler.toml), which skips the audience check. See docs/secrets.md.
-    ALLOWED_PRODUCTION_ORIGIN: 'https://your-domain.example',
+    // Left unset in dev (wrangler.toml), which skips the audience check.
+    ALLOWED_PRODUCTION_ORIGIN,
   },
   assets: {
     html_handling: 'auto-trailing-slash',
     not_found_handling: 'single-page-application',
   },
+  // Claim `<domain>/*` — the catch-all. Child mini apps bind more-specific
+  // `/<slug>` + `/<slug>/*` routes that win over this. Activates automatically once
+  // ALLOWED_PRODUCTION_ORIGIN is your real domain (the zone + a proxied DNS record
+  // must already exist — see docs/domain-setup.md §1-2).
+  ...(hasRealOrigin
+    ? { routes: [`${new URL(ALLOWED_PRODUCTION_ORIGIN).host}/*`] }
+    : {}),
   url: true,
 })
 

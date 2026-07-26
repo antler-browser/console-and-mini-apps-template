@@ -300,7 +300,9 @@ function report(done: string[], migrated: boolean): void {
   if (originIsPlaceholder) {
     steps.push(
       'Once you have a domain, set the production origin everywhere at once:\n' +
-        '   pnpm setup-project --allowed-production-origin https://your.domain',
+        '   pnpm setup-project --allowed-production-origin https://your.domain\n' +
+        '   (the next pnpm deploy:cloudflare then attaches Cloudflare routes\n' +
+        '   automatically — the console’s <domain>/* and each app’s /<slug>/*)',
     )
   }
   if (!githubUrl) {

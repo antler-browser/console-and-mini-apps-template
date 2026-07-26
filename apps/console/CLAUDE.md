@@ -132,13 +132,15 @@ Auth states in the client (`useLocalFirstAuth()`):
 ## Deployment
 
 `alchemy.run.ts` deploys the Worker + host D1 + managed-app bindings
-(`pnpm deploy:cloudflare`). `wrangler.toml` is **dev-only**. The `<domain>/*` route is
-attached manually in the Cloudflare dashboard (path routing needs a real zone — see
-[`docs/domain-setup.md`](./docs/domain-setup.md)). The `ALLOWED_PRODUCTION_ORIGIN`
-value is a committed literal in `alchemy.run.ts` on purpose (see
-[`docs/secrets.md`](./docs/secrets.md)) — replace `https://your-domain.example` with
-your domain (or run `pnpm setup-project --allowed-production-origin https://your.domain`
-from the repo root).
+(`pnpm deploy:cloudflare`). `wrangler.toml` is **dev-only**. The `<domain>/*` catch-all
+route attaches automatically at deploy once `ALLOWED_PRODUCTION_ORIGIN` is your real
+domain (path routing needs a real zone + proxied DNS record — see
+[`docs/domain-setup.md`](./docs/domain-setup.md)); with the placeholder still in place
+you only get the workers.dev URL. The `ALLOWED_PRODUCTION_ORIGIN` value is a committed
+literal in `alchemy.run.ts` on purpose (see [`docs/secrets.md`](./docs/secrets.md)) —
+replace `https://your-domain.example` with your domain (or run
+`pnpm setup-project --allowed-production-origin https://your.domain` from the repo
+root).
 
 ## Troubleshooting
 

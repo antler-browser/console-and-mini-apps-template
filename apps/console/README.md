@@ -80,8 +80,9 @@ pnpm run deploy:cloudflare   # build + alchemy deploy
 ```
 
 A custom domain / Cloudflare zone is a prerequisite for path-based routing — set that up
-first per [`docs/domain-setup.md`](./docs/domain-setup.md), then attach the host's
-`<domain>/*` route.
+first per [`docs/domain-setup.md`](./docs/domain-setup.md). Once `ALLOWED_PRODUCTION_ORIGIN`
+in `alchemy.run.ts` is your real domain, deploying attaches the host's `<domain>/*`
+catch-all route automatically.
 
 ## Documentation
 

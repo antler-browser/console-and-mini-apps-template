@@ -39,23 +39,30 @@ Alchemy needs a `CLOUDFLARE_API_TOKEN` (and account access) with at least:
 > account — and make sure those credentials actually have access to it (`pnpm wrangler
 > whoami` should list it; otherwise use a `CLOUDFLARE_API_TOKEN` scoped to that account).
 
-## 4. Deploy the host and attach the route
+## 4. Set the production origin and deploy the host
 
-Deploy the host Worker:
+Set the real domain everywhere at once (rewrites `ALLOWED_PRODUCTION_ORIGIN` in every
+app's `alchemy.run.ts`, plus the template):
+
+```bash
+pnpm setup-project --allowed-production-origin https://example.com
+```
+
+Then deploy the host Worker:
 
 ```bash
 pnpm run deploy:cloudflare
 ```
 
-This deploys to a `*.workers.dev` URL (useful for a first smoke test). Then attach the
-custom-domain route manually in the Cloudflare dashboard:
+This deploys to a `*.workers.dev` URL (useful for a first smoke test) **and**, now that
+the origin is your real domain, automatically attaches the `example.com/*` catch-all
+route to the zone from step 1. While `ALLOWED_PRODUCTION_ORIGIN` is still the
+`your-domain.example` placeholder, no route is attached — you only get the workers.dev
+URL.
 
-- **Workers & Pages** → select this Worker → **Settings** → **Domains & Routes** →
-  **Add route**.
-- Pattern `example.com/*`, select the zone you added in step 1.
-
-Use a Worker **Route** (the `example.com/*` pattern), not "Add Custom Domain" — child mini
-apps bind more-specific routes (`example.com/<slug>/*`) that must win over this catch-all.
+This is a Worker **Route** (the `example.com/*` pattern), not a "Custom Domain" — child
+mini apps bind more-specific routes (`example.com/<slug>/*`) that must win over this
+catch-all.
 
 ## 5. Deploy child mini apps
 
