@@ -27,7 +27,7 @@ import { MANAGED_APPS } from '@console-and-mini-apps-template/console-shared'
 // `pnpm setup-project --allowed-production-origin`; to change it later, edit this
 // literal (in each app and the template). While it is still the placeholder, no
 // routes are attached — the Worker only gets its workers.dev URL. See docs/secrets.md.
-const ALLOWED_PRODUCTION_ORIGIN = 'https://x.example'
+const ALLOWED_PRODUCTION_ORIGIN = 'https://your-domain.example'
 const hasRealOrigin = !ALLOWED_PRODUCTION_ORIGIN.includes('your-domain.example')
 
 // Initialize Alchemy app with remote state store

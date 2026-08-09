@@ -28,24 +28,37 @@ monorepo changes how they're developed, not how they ship.
 ## Use this template
 
 1. Click **Use this template** on GitHub (or fork), then clone your copy.
-2. Install and rename everything to your project:
+2. Install and run the setup wizard:
 
    ```bash
    pnpm install
+   pnpm setup-project
+   ```
+
+   Run from a terminal, it walks you through all five settings — project name,
+   `ALCHEMY_STATE_TOKEN` (press Enter to generate one), `CLOUDFLARE_ACCOUNT_ID`,
+   production origin, and your fork's GitHub URL — and everything but the name is
+   skippable. It rewrites the package scope (`@my-space/*`), Cloudflare resource
+   names (`my-space-dev`, `my-space-dev-db`), and display strings ("Welcome to
+   My Space") in one shot, writes the deploy creds to `apps/console/.env`, migrates
+   the console's local D1 (fully local — no Cloudflare account needed), and prints
+   a checklist of anything left.
+
+   Every question can also be answered up front — the positional name plus
+   `--alchemy-state-token`, `--cloudflare-account-id`,
+   `--allowed-production-origin`, and `--github-url` — and any flag you pass skips
+   its question. Non-interactive runs (CI, Claude Code) never prompt: they use the
+   flags as given, and anything unset lands on the closing checklist instead.
+
+   ```bash
    pnpm setup-project my-space \
      --allowed-production-origin https://my.domain \
      --github-url https://github.com/you/your-fork
    ```
 
-   This rewrites the package scope (`@my-space/*`), Cloudflare resource names
-   (`my-space-dev`, `my-space-dev-db`), and display strings ("Welcome to My Space")
-   in one shot, then migrates the console's local D1 (fully local — no Cloudflare
-   account needed) and prints a checklist of anything left. The flags are optional:
-   `--allowed-production-origin` sets the production auth origin in each app's
-   `alchemy.run.ts` (skip it until you have a domain), and `--github-url` points each
-   app's footer link at your fork. Setup is one-time — the name defaults to the repo
-   directory, and re-running on an already-set-up project errors out; later changes
-   are plain file edits (the error message says which files).
+   Setup is one-time — the name defaults to the repo directory, and re-running on
+   an already-set-up project errors out; later changes are plain file edits (the
+   error message says which files).
 
    Run `setup-project` **before** scaffolding any apps — `new-app` bakes the
    workspace name into everything it generates.
@@ -68,7 +81,7 @@ Requires Node >= 22 (`.nvmrc`) and pnpm 10.
 | `pnpm build` | Build every app (from the root) |
 | `pnpm typecheck` | Typecheck every app (from the root) |
 | `pnpm new-app <slug>` | Scaffold a new mini app |
-| `pnpm setup-project [name] [--allowed-production-origin <url>] [--github-url <url>] [--alchemy-state-token <value>]` | One-time project setup: name, deploy creds, prod origin, footer repo link |
+| `pnpm setup-project [name] [--alchemy-state-token <value>] [--cloudflare-account-id <id>] [--allowed-production-origin <url>] [--github-url <url>]` | One-time project setup: name, deploy creds, prod origin, footer repo link (a wizard when run interactively) |
 
 Each app claims its own worker + vite port pair (console is 8787/5173, the next app
 gets 8788/5174, and so on). Anything app-specific runs from the app's directory,
@@ -97,10 +110,10 @@ with the host console** after its first deploy (needs the real prod D1 UUID) —
 Apps deploy independently to Cloudflare's free tier:
 
 ```bash
-# once per app: deploy credentials (alchemy is an app-level devDep, not a root one)
 cd apps/console
-# pnpm setup-project already created .env with ALCHEMY_STATE_TOKEN — just fill in
-# CLOUDFLARE_ACCOUNT_ID (no .env yet? cp .env.example .env, see its comments)
+# pnpm setup-project already wrote ALCHEMY_STATE_TOKEN (and CLOUDFLARE_ACCOUNT_ID,
+# if you gave one) to .env, and new-app copies both into each app it scaffolds —
+# missing something? cp .env.example .env and see its comments
 pnpm exec alchemy configure   # once: Cloudflare API token
 
 pnpm run deploy:cloudflare    # per app: build + deploy
@@ -109,14 +122,17 @@ pnpm run deploy:cloudflare    # per app: build + deploy
 `ALCHEMY_STATE_TOKEN` is a secret you invent yourself (not fetched from anywhere) —
 it guards the small state Worker Alchemy deploys to your Cloudflare account. One
 token per account: if you already deployed another Alchemy project there, reuse that
-token (`pnpm setup-project` asks for it and generates one only if you don't have one).
+token (the `setup-project` wizard asks for it and generates one only if you press
+Enter; a non-interactive run without the flag leaves it as a checklist item).
 
 Path-based routing (`<domain>/<slug>/*`) needs a real Cloudflare zone — a custom
-domain, not `*.workers.dev`. Set that up per
-[`apps/console/docs/domain-setup.md`](apps/console/docs/domain-setup.md), attach the
-host's `<domain>/*` route in the dashboard, and replace the
-`https://your-domain.example` placeholder in each app's `alchemy.run.ts` (and in
-`templates/mini-app-starter/alchemy.run.ts`, so future apps inherit it).
+domain, not `*.workers.dev`. Set up the zone and a proxied DNS record per
+[`apps/console/docs/domain-setup.md`](apps/console/docs/domain-setup.md), then
+replace the `https://your-domain.example` placeholder in each app's
+`alchemy.run.ts` (and in `templates/mini-app-starter/alchemy.run.ts`, so future
+apps inherit it). Once the origin is your real domain, the next deploy attaches
+the routes automatically — the console claims the `<domain>/*` catch-all and each
+mini app claims its more-specific `/<slug>/*`.
 
 ## Secrets & env vars
 
