@@ -4,7 +4,7 @@
  * Each manageable app is an independent child Worker with its own D1 database. The host
  * Worker binds to those databases directly (referenced by UUID in alchemy.run.ts /
  * wrangler.toml — the child apps own/migrate them) — this only works because every app
- * deploys to the same pinned Cloudflare account (see docs/domain-setup.md §3).
+ * deploys to the same pinned Cloudflare account (see docs/domain-setup.md §2).
  *
  * The registry itself (`MANAGED_APPS`, the slug ↔ binding ↔ db-name mapping) is the single
  * source of truth in `@console-and-mini-apps-template/console-shared`, shared with alchemy.run.ts. This module re-exports

@@ -7,15 +7,15 @@ Guidance for Claude Code when working on `apps/console`, the multi-app **host**.
 This app is the catch-all Cloudflare Worker for the whole domain. It serves a **landing
 grid** of mini apps (`client/src/apps.ts`) at `/`, an SPA fallback for unclaimed paths,
 and an authed **admin console** (Settings → Admin). Each mini app is an independent
-Worker bound to `<domain>/<slug>/*` — the most-specific route wins, so child apps
-automatically override this catch-all for their own paths. The bare `/<slug>` path is
+Worker bound to `<domain>/<slug>/*` — Worker Routes take precedence over the host's
+Custom Domain, so child apps override this catch-all for their own paths. The bare `/<slug>` path is
 not claimed; inbound links always use the trailing-slash form `/<slug>/`.
 
 Unlike the mini apps, the host has **no Durable Object and no WebSockets**. It does have
 its own D1 (the operator allowlist: `users.is_admin` gates the admin console) and binds
 each managed child app's D1 directly so operators can manage users across apps.
 
-See [`docs/domain-setup.md`](./docs/domain-setup.md) (zone + proxied DNS + routes
+See [`docs/domain-setup.md`](./docs/domain-setup.md) (zone + Custom Domain + routes
 prerequisite) and [`docs/hosting-a-mini-app.md`](./docs/hosting-a-mini-app.md)
 (child-app subpath + admin contract).
 
@@ -133,10 +133,10 @@ Auth states in the client (`useLocalFirstAuth()`):
 ## Deployment
 
 `alchemy.run.ts` deploys the Worker + host D1 + managed-app bindings
-(`pnpm deploy:cloudflare`). `wrangler.toml` is **dev-only**. The `<domain>/*` catch-all
-route attaches automatically at deploy once `ALLOWED_PRODUCTION_ORIGIN` is your real
-domain (path routing needs a real zone + proxied DNS record — see
-[`docs/domain-setup.md`](./docs/domain-setup.md)); with the placeholder still in place
+(`pnpm deploy:cloudflare`). `wrangler.toml` is **dev-only**. The domain binds as a
+Custom Domain (the catch-all) automatically at deploy once `ALLOWED_PRODUCTION_ORIGIN`
+is your real domain — Cloudflare creates the DNS record + TLS cert; only the zone must
+exist (see [`docs/domain-setup.md`](./docs/domain-setup.md)); with the placeholder still in place
 you only get the workers.dev URL. The `ALLOWED_PRODUCTION_ORIGIN` value is a committed
 literal in `alchemy.run.ts` on purpose (see [`docs/secrets.md`](./docs/secrets.md)) —
 replace `https://your-domain.example` with your domain.

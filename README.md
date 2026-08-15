@@ -126,13 +126,14 @@ token (the `setup-project` wizard asks for it and generates one only if you pres
 Enter; a non-interactive run without the flag leaves it as a checklist item).
 
 Path-based routing (`<domain>/<slug>/*`) needs a real Cloudflare zone — a custom
-domain, not `*.workers.dev`. Set up the zone and a proxied DNS record per
+domain, not `*.workers.dev`. Set up the zone per
 [`apps/console/docs/domain-setup.md`](apps/console/docs/domain-setup.md), then
 replace the `https://your-domain.example` placeholder in each app's
 `alchemy.run.ts` (and in `templates/mini-app-starter/alchemy.run.ts`, so future
 apps inherit it). Once the origin is your real domain, the next deploy attaches
-the routes automatically — the console claims the `<domain>/*` catch-all and each
-mini app claims its more-specific `/<slug>/*`.
+everything automatically — the console binds the domain as a Custom Domain (the
+catch-all; Cloudflare creates the DNS record + TLS cert) and each mini app claims
+its `/<slug>/*` route, which takes precedence.
 
 ## Secrets & env vars
 

@@ -4,15 +4,16 @@
  * This app is the catch-all Worker: it serves the landing-grid SPA and an SPA
  * fallback for any path not claimed by a more-specific child app Worker. Child
  * mini apps live at `apps/<slug>` in this workspace, are deployed independently, and
- * bind their own route pattern (`<domain>/<slug>/*`). Cloudflare
- * resolves the most-specific route first, so child apps automatically override this
- * catch-all.
+ * bind their own route pattern (`<domain>/<slug>/*`). Worker Routes take precedence
+ * over a Custom Domain on the same hostname, so child apps automatically override
+ * this catch-all.
  *
  * Path-based routes only work on a Cloudflare zone (a custom domain), NOT on
  * *.workers.dev. This script always deploys to a workers.dev URL via `url: true`, and
- * additionally attaches the `<domain>/*` catch-all route automatically once
- * ALLOWED_PRODUCTION_ORIGIN below is your real domain — the zone + a proxied DNS
- * record must already exist (see docs/domain-setup.md §1-2).
+ * additionally binds the domain as a Custom Domain automatically once
+ * ALLOWED_PRODUCTION_ORIGIN below is your real domain — Cloudflare creates the DNS
+ * record + TLS cert itself; only the zone must already exist (see
+ * docs/domain-setup.md §1).
  */
 
 import alchemy from 'alchemy'
@@ -58,7 +59,7 @@ const database = await D1Database(`${app.name}-${app.stage}-db`, {
  * and write `users.is_admin` directly. Because this is a plain reference object (not a managed
  * `D1Database()` resource), the host can never create/replace/delete the child's database — it
  * just points at the existing one. This requires every app to live in the same pinned
- * Cloudflare account (see docs/domain-setup.md §3).
+ * Cloudflare account (see docs/domain-setup.md §2).
  *
  * One Worker binding per `MANAGED_APPS` entry — the registry in `@console-and-mini-apps-template/console-shared` is the single
  * source of truth (including each DB's `databaseId`), shared with server/src/admin-apps.ts.
@@ -78,7 +79,7 @@ const managedDbBindings = Object.fromEntries(
 
 /**
  * Catch-all host Worker. Always deploys to a workers.dev URL (a first smoke test);
- * the custom-domain route attaches automatically below once ALLOWED_PRODUCTION_ORIGIN
+ * the Custom Domain binds automatically below once ALLOWED_PRODUCTION_ORIGIN
  * is your real domain. See docs/domain-setup.md.
  */
 export const worker = await Worker('worker', {
@@ -95,12 +96,13 @@ export const worker = await Worker('worker', {
     html_handling: 'auto-trailing-slash',
     not_found_handling: 'single-page-application',
   },
-  // Claim `<domain>/*` — the catch-all. Child mini apps bind more-specific
-  // `/<slug>/*` routes that win over this. Activates automatically once
-  // ALLOWED_PRODUCTION_ORIGIN is your real domain (the zone + a proxied DNS record
-  // must already exist — see docs/domain-setup.md §1-2).
+  // Bind the domain as a Custom Domain — the catch-all. Cloudflare creates the
+  // DNS record + TLS cert automatically (no manual DNS step). Child mini apps
+  // bind `/<slug>/*` Worker Routes, which take precedence over a Custom Domain
+  // on the same hostname. Activates automatically once ALLOWED_PRODUCTION_ORIGIN
+  // is your real domain (the zone must exist — see docs/domain-setup.md §1).
   ...(hasRealOrigin
-    ? { routes: [`${new URL(ALLOWED_PRODUCTION_ORIGIN).host}/*`] }
+    ? { domains: [new URL(ALLOWED_PRODUCTION_ORIGIN).host] }
     : {}),
   url: true,
 })

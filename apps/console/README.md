@@ -23,8 +23,8 @@ that child app's Worker. Host-served routes (like Settings) are marked `internal
 client-side routing instead.
 
 **Child apps.** Mini apps deploy as their own Workers, each with
-its own D1 database and (if needed) Durable Object. They bind two route patterns —
-`<domain>/<slug>` and `<domain>/<slug>/*` — which win over the host's `<domain>/*` catch-all.
+its own D1 database and (if needed) Durable Object. They bind a `<domain>/<slug>/*`
+route pattern — Worker Routes take precedence over the host's Custom Domain catch-all.
 Path-based routes only work on a **Cloudflare zone** (a custom domain), not `*.workers.dev`.
 See [`docs/domain-setup.md`](./docs/domain-setup.md) and
 [`docs/hosting-a-mini-app.md`](./docs/hosting-a-mini-app.md).
@@ -86,13 +86,13 @@ already deployed there (`pnpm setup-project` handles this).
 
 A custom domain / Cloudflare zone is a prerequisite for path-based routing — set that up
 first per [`docs/domain-setup.md`](./docs/domain-setup.md). Once `ALLOWED_PRODUCTION_ORIGIN`
-in `alchemy.run.ts` is your real domain, deploying attaches the host's `<domain>/*`
-catch-all route automatically.
+in `alchemy.run.ts` is your real domain, deploying binds it as a Custom Domain
+automatically (Cloudflare creates the DNS record + TLS cert).
 
 ## Documentation
 
 - [CLAUDE.md](./CLAUDE.md) — development guide for Claude Code
-- [docs/domain-setup.md](./docs/domain-setup.md) — Cloudflare zone + proxied DNS + routes (prerequisite)
+- [docs/domain-setup.md](./docs/domain-setup.md) — Cloudflare zone + Custom Domain + routes (prerequisite)
 - [docs/hosting-a-mini-app.md](./docs/hosting-a-mini-app.md) — child-app subpath contract + admin console binding
 - [docs/admin-setup.md](./docs/admin-setup.md) — host operators vs per-app admins
 - [../../docs/local-first-auth-spec.md](../../docs/local-first-auth-spec.md) — Local First Auth specification

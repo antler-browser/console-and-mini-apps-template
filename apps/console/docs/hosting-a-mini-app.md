@@ -205,7 +205,7 @@ via `MANAGED_APPS`) and writes `users.is_admin` itself. This is simpler to opera
 the cost of one hard requirement:
 
 > **All apps must live in the same pinned Cloudflare account** (`CLOUDFLARE_ACCOUNT_ID`,
-> see [`docs/domain-setup.md`](./domain-setup.md) §3). D1 bindings are account-scoped, so a
+> see [`docs/domain-setup.md`](./domain-setup.md) §2). D1 bindings are account-scoped, so a
 > Worker can only bind databases in its own account.
 
 What this means for a child app:
