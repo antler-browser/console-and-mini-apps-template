@@ -116,6 +116,7 @@ function ProfileSection({ editable }: { editable: boolean }) {
   const [loading, setLoading] = useState(true)
   const [mode, setMode] = useState<Mode>('view')
   const [confirmingLogout, setConfirmingLogout] = useState(false)
+  const [syncError, setSyncError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     const api = hostApi()
@@ -137,9 +138,18 @@ function ProfileSection({ editable }: { editable: boolean }) {
     }
   }, [])
 
+  // Upsert the profile into the host D1 on every visit (idempotent server-side).
+  // This is the only registration path for native hosts (Antler), whose users get
+  // the read-only view and never hit the editor onComplete callbacks.
+  const sync = useCallback(async () => {
+    const result = await syncProfileToDatabase()
+    setSyncError(result.ok ? null : result.error)
+  }, [])
+
   useEffect(() => {
     void load()
-  }, [load])
+    void sync()
+  }, [load, sync])
 
   if (loading) {
     return <div className="card p-10 text-center text-gray-500">Loading…</div>
@@ -152,7 +162,7 @@ function ProfileSection({ editable }: { editable: boolean }) {
           skipSocialStep={true}
           onComplete={() => {
             setMode('view')
-            void syncProfileToDatabase() // best-effort upsert into the host DB
+            void sync() // best-effort upsert into the host DB
             void load()
           }}
         />
@@ -166,7 +176,7 @@ function ProfileSection({ editable }: { editable: boolean }) {
         <EditProfile
           onComplete={() => {
             setMode('view')
-            void syncProfileToDatabase() // best-effort upsert into the host DB
+            void sync() // best-effort upsert into the host DB
             void load()
           }}
           onBack={() => setMode('view')}
@@ -184,7 +194,7 @@ function ProfileSection({ editable }: { editable: boolean }) {
           customStyles={authStyles}
           onComplete={() => {
             setMode('view')
-            void syncProfileToDatabase() // register the restored DID in the host DB
+            void sync() // register the restored DID in the host DB
             void load()
           }}
           onBack={() => setMode('view')}
@@ -233,6 +243,12 @@ function ProfileSection({ editable }: { editable: boolean }) {
 
   return (
     <div className="space-y-6">
+      {syncError && (
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+          Couldn't sync your profile to the server ({syncError}). The admin won't see you
+          until this succeeds — try reloading.
+        </p>
+      )}
       <section className="space-y-3">
         <h2 className="text-2xl font-semibold text-gray-900">Your Profile</h2>
         <ProfileCard
