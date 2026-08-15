@@ -31,8 +31,8 @@ prerequisite) and [`docs/hosting-a-mini-app.md`](./docs/hosting-a-mini-app.md)
 - `src/components/admin/` — `AdminSection.tsx` (self-gating via `GET /api/admin/status`),
   `AdminAppCard.tsx` (per-app user management)
 - `src/lib/adminApi.ts` — typed client for the admin API
-- `src/hooks/useLocalFirstAuth.tsx` — auth state; exports `AuthProvider` and
-  `useLocalFirstAuth()`
+- `src/lib/userApi.ts` — `syncProfileToDatabase()`: best-effort upsert of the caller's
+  profile + avatar into the host D1 (there is no auth provider/hook in the console)
 - `public/local-first-auth-manifest.json` — mini-app manifest (name, icon, permissions)
 
 ### Server (`server/`)
@@ -122,13 +122,14 @@ browser injects `window.localFirstAuth`, identity is a `did:key`, and API calls 
 short-lived EdDSA JWTs verified by `shared/src/jwt.ts` against `ALLOWED_PRODUCTION_ORIGIN`
 (prod only — it's unset in dev, which skips the audience check).
 
-Auth states in the client (`useLocalFirstAuth()`):
-
-| State | Condition | Show |
-|---|---|---|
-| Loading | `loading === true` | Spinner |
-| Logged out | `user === null` | Onboarding trigger (`setIsOnboardingModalOpen(true)`) |
-| Logged in | `user !== null` | User content |
+The console has no auth provider/hook (unlike the mini-app starter's
+`useLocalFirstAuth`); Settings uses `useOnboarding()` from `local-first-auth/react` to
+inject the web mock, and `isNativeHost()` in `src/routes/settings.tsx` discriminates
+native hosts (injected API with no localStorage profile → read-only profile view).
+Home and Settings each best-effort upsert the caller into the host D1 via
+`syncProfileToDatabase()` (`src/lib/userApi.ts`) on mount, so native-host (Antler)
+users self-register even though they never use the profile editors; Settings surfaces
+sync failures in a banner.
 
 ## Deployment
 

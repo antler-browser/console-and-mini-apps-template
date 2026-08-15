@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { apps, type MiniApp } from '../apps'
+import { syncProfileToDatabase } from '../lib/userApi'
 
 /** Card classes shared by external (cross-document) and internal (host route) links. */
 const cardClasses =
@@ -7,6 +9,13 @@ const cardClasses =
 
 export function Home() {
   const hasMiniApps = apps.some((app) => !app.internal)
+
+  // Best-effort registration so an admin has a users row to approve. No-ops for web
+  // visitors (no injected API on this route); native hosts (Antler) always inject it —
+  // and this is their landing page, which they may visit without ever opening Settings.
+  useEffect(() => {
+    void syncProfileToDatabase()
+  }, [])
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-12 sm:py-16">
